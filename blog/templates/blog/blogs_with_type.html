@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+{% extends 'blog/blog_list.html' %}
+
+{% block title %}
+    {{ blog_type.type_name }}
+{% endblock %}
+
+{% block blog_list_title %}
+    {{ blog_type.type_name }} 
+     (Total Number of Blogs: {{ page_of_blogs.paginator.count }})
+    <a href="{% url 'blog_list' %}">View All Blogs</a>
+{% endblock %}
+

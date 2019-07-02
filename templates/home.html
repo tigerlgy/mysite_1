@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+    Tiger's Blog
+{% endblock %}
+
+{% block header_extends %}
+    <link rel="stylesheet" href="{% static 'home.css' %}">
+    <script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+
+{% block content %}
+    <!--img alt="" src="/media/upload/2019/05/24/merry_chroma_3200x1800_WERIrkh.jpg" style="height:260px; width:560px" /-->
+    <h3 class="home-content">Welcome to my blog where I start to build a website from scrarch with Django!</h3>
+    <div id="container" style="width: 600px;height:400px;"></div>
+    <div class="hot-data">
+        <h3>Popular Blogs Today</h3>
+        <ul>
+            {% for hot_data in today_hot_data %}
+                <li><a href="{% url 'blog_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>({{ hot_data.read_num }})</li>
+            {% empty %}
+                <li> No Information Available Yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="hot-data">
+        <h3>Popular Blogs Yesterday</h3>
+        <ul>
+            {% for hot_data in yesterday_hot_data %}        
+                <li><a href="{% url 'blog_detail' hot_data.content_object.pk %}">{{ hot_data.content_object.title }}</a>({{ hot_data.read_num }})</li>
+            {% empty %}
+                <li> No Information Available Yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="hot-data">
+        <h3>Popular Blogs Past Week</h3>
+        <ul>
+        {% for hot_blog in seven_days_hot_blogs %}                          
+            <li><a href="{% url 'blog_detail' hot_blog.id %}">{{ hot_blog.title }}</a>({{ hot_blog.read_num_sum }})</li>
+        {% empty %}
+            <li> No Information Available Yet.</li>
+        {% endfor %}
+        </ul>
+    </div>
+	<script>
+            var options = {
+		chart: { type: 'column'},
+                title: { text: 'Views in last 7 days' },
+		xAxis: { categories: {{ dates|safe }} },
+		yAxis: {
+		    title : { text: null },
+		    labels: { enabled: false },
+		    gridLineDashStyle: 'Dash',
+		},
+		plotOptions: {
+		    series: {
+		        borderRadius: 10
+	            }
+		},
+		series: [{
+		    name: 'Views',
+		    data: {{ read_nums }},
+		    color: "#2f696b"
+		}],
+		legend: { enabled: false },
+		credits: { enabled: false },
+	    };
+            var chart = Highcharts.chart('container', options);
+        </script>
+{% endblock %}
+

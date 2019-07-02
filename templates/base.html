@@ -1,0 +1,119 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+    <meta charset='UTF-8'>
+    <meta http-equiv="X-UA-COmpatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7/css/bootstrap.min.css' %}">
+    {% block header_extends %}{% endblock %}
+</head>
+<body>
+   <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+       <div class="container-fluid">
+           <div class="navbar-header">
+	       <a style="color:white"  class="navbar-brand" href="{% url 'home' %}">Personal Blog for Django Study
+	       </a>
+	       <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+	           <span class="icon-bar"></span>
+		   <span class="icon-bar"></span>
+		   <span class="icon-bar"></span>
+	       </button>
+           </div>
+	   <div id="navbar-collapse" class="collapse navbar-collapse">
+	       <ul class="nav navbar-nav">
+	           <li class="{% block nav_home_active %}{% endblock %}">
+	               <a style="color:white" class='text' href="{% url 'home' %}">Home</a>
+		   </li>
+		   <li class="{% block nav_blog_active %}{% endblock %}"> 
+		       <a style="color:white" class='text' href="{% url 'blog_list' %}">Blogs</a>
+		   </li>
+	       </ul>
+	       <ul class="nav navbar-nav navbar-right">
+		   {% if not user.is_authenticated %}
+		       <li>
+		           <a style="color:white" href="{% url 'login' %}?from={{ request.get_full_path }}">User Login</a>
+		       </li>
+		       <li>
+		           <a style="color:white" href="{% url 'register' %}?from={{ request.get_full_path }}">Register</a>
+		       </li>
+
+		   {% else %}
+		       <li class="dropdown">
+	                   <a style="color:white" href="#" class="dropdown-toggle" 
+							   data-toggle="dropdown" role="button">
+			       {% if user.has_nickname %}
+		                   {{ user.username }}({{ user.get_nickname }})
+			       {% else %}
+			           {{ user.username }}
+			       {% endif %}
+			       <span class="caret"></span>
+			   </a>
+		           <ul class="dropdown-menu">
+			       <li><a href="{% url 'user_info' %}">Accout</a></li>
+			       <li><a href="{% url 'change_password' %}">Change Password</a></li>
+			       {% if user.is_staff or user.is_superuser %}
+			           <li><a href="{% url 'admin:index' %}">Admin</a></li>
+			       {% endif %}
+		               <li role="separator" class="divider"></li>
+			       <li><a href="{% url 'logout' %}?from={{ request.get_full_path }}">Logout</a><li>
+	                   </ul>
+		       </li>
+		   {% endif %}
+	       </ul>
+	   </div>
+        </div>
+    </div>
+
+    {% block content %}{% endblock %}
+    <script type="text/javascript" src="{% static 'jquery-3.4.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script> 
+    <!-- Modal -->
+    <div class="modal fade" id="login_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <form id="login_modal_form" action="" method="POST">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 clss="modal-title">User Login</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {% for field in login_modal_form %}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                        {% endfor %}
+                        <span id="login_modal_tip" class="text-danger"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $("#login_modal_form").submit(function(event){
+            // prevent wrong data to be submitted and redirecion 
+            event.preventDefault();
+            $.ajax({
+                url: '{% url "login_for_modal" %}',
+                type:'POST',
+                data:$(this).serialize(),
+                cache:false,
+                success: function(data){
+                    if(data['status']=='SUCCESS'){
+                        window.location.reload();
+                    }else{
+                        $('#login_modal_tip').text('Either your username or password is incorrect.');
+                    }    
+                }
+            });
+        });
+    </script>
+    {% block script_extends %}{% endblock %}
+</body>
+</html>
