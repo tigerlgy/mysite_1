@@ -1,0 +1,17 @@
+div.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.read {
+    color: #bbb;
+}
+
+.read a {
+    color: #bbb;
+}
+
+.notifications {
+    margin-top: 1em;
+}

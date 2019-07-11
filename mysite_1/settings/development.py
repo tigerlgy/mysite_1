@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'comment',
     'likes',
     'user',
+    'notifications',
+    'my_notifications',
 ]
 
 MIDDLEWARE = [
@@ -189,3 +191,8 @@ EMAIL_USE_STARTTLS = True # TLS (safety link)
 EMAIL_HOST_USER = 'guangyuan.liu@ngaa.com.cn'
 EMAIL_HOST_PASSWORD = '19930821'
 EMAIL_SUBJECT_PREFIX = '[Personal Django Blog]'
+
+# django-notification-hq
+DJANGO_NOTIFICATIONS_CONFIG = {
+    'USE_JSONFIELD': True,
+}

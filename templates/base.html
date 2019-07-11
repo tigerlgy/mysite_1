@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load notifications_tags %}
 <!DOCTYPE html>
 <html lang='zh-CN'>
 <head>
@@ -14,7 +15,7 @@
    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
        <div class="container-fluid">
            <div class="navbar-header">
-	       <a style="color:white"  class="navbar-brand" href="{% url 'home' %}">Personal Blog for Django Study
+	       <a style="color:white"  class="navbar-brand" href="{% url 'home' %}"> Django Study Blog
 	       </a>
 	       <button class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
 	           <span class="icon-bar"></span>
@@ -41,35 +42,45 @@
 		       </li>
 
 		   {% else %}
+                       {% notifications_unread as unread_count %} 
 		       <li class="dropdown">
 	                   <a style="color:white" href="#" class="dropdown-toggle" 
 							   data-toggle="dropdown" role="button">
-			       {% if user.has_nickname %}
-		                   {{ user.username }}({{ user.get_nickname }})
-			       {% else %}
-			           {{ user.username }}
-			       {% endif %}
+                               Welcome! {{ user.get_nickname_or_username }}
+                               <span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span>
 			       <span class="caret"></span>
 			   </a>
 		           <ul class="dropdown-menu">
-			       <li><a href="{% url 'user_info' %}">Accout</a></li>
+			       <li><a href="{% url 'user_info' %}">Accout Details</a></li>
 			       <li><a href="{% url 'change_password' %}">Change Password</a></li>
+			       <li><a href="{% url 'my_notifications' %}">My Notifications <span class="badge unread-count live_notify_badge">{% if unread_count > 0 %}{{ unread_count }}{% endif %}</span></a></li>
 			       {% if user.is_staff or user.is_superuser %}
-			           <li><a href="{% url 'admin:index' %}">Admin</a></li>
+			           <li><a href="{% url 'admin:index' %}">Go To Admin</a></li>
 			       {% endif %}
 		               <li role="separator" class="divider"></li>
 			       <li><a href="{% url 'logout' %}?from={{ request.get_full_path }}">Logout</a><li>
-	                   </ul>
-		       </li>
-		   {% endif %}
-	       </ul>
-	   </div>
+                            </ul>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <form class="navbar-form search-form" action="{% url 'search' %}">
+                            <div class="form-group">
+                                <input type="text" name="wd" class="form-control" placeholder="Search">
+                            </div>
+                            <button type="submit" class="btn btn-default">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form>
+                    </li>                
+                </ul>
+            </div>
         </div>
     </div>
 
     {% block content %}{% endblock %}
     <script type="text/javascript" src="{% static 'jquery-3.4.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap-3.3.7/js/bootstrap.min.js' %}"></script> 
+    <script type="text/javascript" src="{% static 'notifications/notify.js' %}"></script>
     <!-- footer -->
     <div class="footer">
         <div class="website-info">
@@ -120,7 +131,17 @@
                 }
             });
         });
+        
+        // Custome notification callbacks
+        function my_special_notification_callback(data){
+            unread_count = data['unread_count'];
+            if (unread_count == 0){
+                unread_count = '';
+            }
+            $('.live_notify_badge').text(unread_count);
+        }
     </script>
+    {% register_notify_callbacks callbacks='my_special_notification_callback' %}
     {% block script_extends %}{% endblock %}
 </body>
 </html>

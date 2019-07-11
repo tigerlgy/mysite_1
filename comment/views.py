@@ -7,30 +7,10 @@ from .forms import CommentForm
 
 # Create your views here.
 def update_comment(request):
-    '''referer = request.META.get('HTTP_REFERER', reverse('home'))
-    if not request.user.is_authenticated: 
-        return render(request,'error.html',{'message':'Please login first.','redirect_to': referer})
-    text = request.POST.get('text', '')
-    if text =='':
-        return render(request,'error.html',{'message':'You can not post an empty comment.','redirect_to': referer})
-    
-    try:
-        content_type = request.POST.get('content_type', '')
-        object_id  = int(request.POST.get('object_id', ''))
-        model_class = ContentType.objects.get(model=content_type).model_class()
-        model_obj = model_class.objects.get(pk=object_id)
-    except Exception as e:
-        return render(request,'error.html',{'message':'The blog you try to comment does not exsit any more.', 'redirect_to': referer})
-
-    comment = Comment()
-    comment.user = request.user
-    comment.text = text
-    comment.content_object = model_obj
-    comment.save()
-    return redirect(referer)'''
     referer = request.META.get('HTTP_REFERER', reverse('home'))
     comment_form = CommentForm(request.POST, user=request.user)
     data = {}
+
     if comment_form.is_valid():
         comment = Comment()
         comment.user = comment_form.cleaned_data['user']
@@ -43,9 +23,6 @@ def update_comment(request):
             comment.parent = parent
             comment.reply_to = parent.user
         comment.save()
-
-        # Send Email notifications
-        comment.send_mail()
         
         data['status'] = 'SUCCESS'
         data['username'] = comment.user.get_nickname_or_username()
