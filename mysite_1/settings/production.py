@@ -223,3 +223,9 @@ LOGGING = {
         },
     },
 }
+
+# django-notification-hq
+DJANGO_NOTIFICATIONS_CONFIG = {
+    'USE_JSONFIELD': True,
+}
+
