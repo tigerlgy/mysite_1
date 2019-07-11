@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'likes',
     'user',
     'notifications',
+    'my_notifications',
 ]
 
 MIDDLEWARE = [
